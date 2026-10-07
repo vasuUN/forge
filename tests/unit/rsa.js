@@ -863,6 +863,26 @@ var UTIL = require('../../lib/util');
         }));
       }
 
+
+      it('should reject extra nested DigestAlgorithm elements', function() {
+        var publicKey = RSA.setPublicKey(
+          new JSBN.BigInteger(new Array(257).join('f'), 16),
+          new JSBN.BigInteger('1', 10));
+        var md = MD.sha256.create();
+        md.update('nested-digest-algorithm');
+        var digest = md.digest().getBytes();
+        var digestInfo = UTIL.hexToBytes(
+          '30343010060960864801650304020105000401000420') + digest;
+        var padding = UTIL.hexToBytes(
+          '0001' + 'ff'.repeat(128 - digestInfo.length - 3) + '00');
+        var signature = padding + digestInfo;
+
+        ASSERT.throws(function() {
+          publicKey.verify(digest, signature);
+        },
+        /^Error: ASN.1 object does not contain a valid RSASSA-PKCS1-v1_5 DigestInfo value\.$/);
+      });
+
       it('should check DigestInfo structure', function() {
         var publicKey = RSA.setPublicKey(N, e);
         // 0xff bytes stolen from padding
