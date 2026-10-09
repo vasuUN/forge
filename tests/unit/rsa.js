@@ -863,7 +863,6 @@ var UTIL = require('../../lib/util');
         }));
       }
 
-
       it('should reject extra nested DigestAlgorithm elements', function() {
         var publicKey = RSA.setPublicKey(
           new JSBN.BigInteger(new Array(257).join('f'), 16),
